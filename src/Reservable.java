@@ -7,9 +7,9 @@ public interface Reservable {
     // Bir şeyin müsait olup olmadığını söyleyebilmeli
     boolean isAvailable();
 
-    //  Rezervasyon yapma işlemi olmalı
+    //  Rezervasyon yapma işlemi
     void reserve();
 
-    //  İptal etme işlemi olmalı
+    //  İptal etme işlemi
     void cancelReservation();
 }
