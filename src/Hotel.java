@@ -112,5 +112,12 @@ public class Hotel {
             String durum = room.isAvailable() ? "[BOŞ]" : "[DOLU]";
             System.out.println(durum + " " + room.toString());
         }
+    }// GUI (Arayüz) sınıfının odalar listesine erişmesi için gerekli metod
+    public List<Room> getRooms() {
+        return rooms;
+    }
+    // GUI'nin rezervasyon listesine erişmesi için gerekli
+    public List<Reservation> getReservations() {
+        return reservations;
     }
 }

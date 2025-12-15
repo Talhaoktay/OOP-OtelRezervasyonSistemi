@@ -1,59 +1,54 @@
 /**
  * Reservation.java
- * Bir rezervasyonun tüm detaylarını (Kim, Nereye, Ne Zaman, Ne Kadar) tutan sınıf.
+ * GÜNCELLENDİ: Oda servisi (serviceCost) özelliği eklendi.
  */
 public class Reservation {
-    private int id;                 // Rezervasyonun benzersiz numarası (Takip etmek için)
-    private Customer customer;      // Müşteri bilgisi
-    private Room room;              // Kiralanan oda
-    private int nightCount;         // Kaç gece kalınıcak?
-    private double totalPrice;      // Toplam ödenmesi gereken tutar
-    private ReservationStatus status; // Durum: ACTIVE veya CANCELLED
+    private int id;
+    private Customer customer;
+    private Room room;
+    private int nightCount;
+    private ReservationStatus status;
 
-    // Kurucu Metod: Rezervasyon oluşturulurken çalışır
+    // YENİ: Ekstra harcamalar (Yemek, içecek vb.)
+    private double serviceCost;
+
     public Reservation(int id, Customer customer, Room room, int nightCount) {
         this.id = id;
         this.customer = customer;
         this.room = room;
         this.nightCount = nightCount;
-
-        // Başlangıçta rezervasyon durumu AKTİF olur
         this.status = ReservationStatus.ACTIVE;
-
-        // İş Mantığı: Toplam Fiyat = Odanın Gecelik Fiyatı x Gece Sayısı
-        // room.calculatePrice() polimorfizm sayesinde Standart veya Deluxe fiyatını getirir.
-        this.totalPrice = room.calculatePrice() * nightCount;
+        this.serviceCost = 0.0; // Başlangıçta ekstra harcama yok
     }
 
-    // Rezervasyonu iptal etme işlemi
+    // --- YENİ: Oda Servisi Ekleme Metodu ---
+    public void addServiceCost(double amount) {
+        this.serviceCost += amount;
+        System.out.println("Rezervasyon #" + id + " hesabına " + amount + " TL eklendi.");
+    }
+
     public void cancel() {
-        // Durumu iptal olarak güncelle
         this.status = ReservationStatus.CANCELLED;
-
-        // Odayı tekrar "Boş" (Rezerve değil) durumuna getiriyoruz
-        room.cancelReservation();
-
-        System.out.println("Rezervasyon #" + id + " iptal edildi. Oda " + room.getRoomNumber() + " boşa çıkarıldı.");
+        this.room.cancelReservation();
     }
 
-    // --- Getter Metodları (Verilere ulaşmak için) ---
+    // --- Getter Metodları ---
 
     public int getId() { return id; }
-
-    public double getTotalPrice() { return totalPrice; }
-
     public Customer getCustomer() { return customer; }
-
     public Room getRoom() { return room; }
+    public ReservationStatus getStatus() { return status; }
 
-    // Rezervasyon bilgilerini toplu yazdırmak için
+    // YENİ: Sadece servis ücretini görmek için
+    public double getServiceCost() { return serviceCost; }
+
+    // GÜNCELLENDİ: Toplam Fiyat = (Oda Fiyatı * Gün) + Ekstra Harcamalar
+    public double getTotalPrice() {
+        return (room.calculatePrice() * nightCount) + serviceCost;
+    }
+
     @Override
     public String toString() {
-        return "Rezervasyon NO: " + id +
-                "\n - Müşteri: " + customer.getName() +
-                "\n - Oda: " + room.toString() +
-                "\n - Süre: " + nightCount + " Gece" +
-                "\n - Toplam Tutar: " + totalPrice + " TL" +
-                "\n - Durum: " + status;
+        return "Rezervasyon #" + id + " - Toplam: " + getTotalPrice() + " TL";
     }
 }
