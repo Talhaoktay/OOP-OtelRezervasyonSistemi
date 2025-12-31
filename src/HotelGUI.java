@@ -1,11 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.Random;
 
+/**
+ * HotelGUI.java
+ * GÜNCELLENDİ: Oda Filtreleme (Dropdown) özelliği eklendi.
+ */
 public class HotelGUI extends JFrame {
     private Hotel hotel;
     private JPanel roomPanel;
+    private JComboBox<String> filterBox; // Filtreleme kutusu
 
     public HotelGUI(Hotel hotel) {
         this.hotel = hotel;
@@ -17,14 +21,39 @@ public class HotelGUI extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // --- 1. BAŞLIK ---
+        // --- 1. ÜST PANEL (BAŞLIK + FİLTRE) ---
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(new Color(60, 63, 65));
+
+        // Başlık
         JLabel titleLabel = new JLabel("OTEL ODA LİSTESİ", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        titleLabel.setOpaque(true);
-        titleLabel.setBackground(new Color(60, 63, 65));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
-        add(titleLabel, BorderLayout.NORTH);
+        topPanel.add(titleLabel, BorderLayout.NORTH);
+
+        // --- FİLTRELEME KUTUSU (YENİ) ---
+        JPanel filterPanel = new JPanel();
+        filterPanel.setBackground(new Color(60, 63, 65));
+        filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+
+        JLabel filterLabel = new JLabel("Oda Tipi Filtrele: ");
+        filterLabel.setForeground(Color.WHITE);
+        filterLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
+        String[] filters = {"Tümü", "Standart Oda", "Deluxe Oda", "Balayı Suiti"};
+        filterBox = new JComboBox<>(filters);
+        filterBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        filterBox.setPreferredSize(new Dimension(150, 30));
+
+        // Filtre değişince listeyi yenile
+        filterBox.addActionListener(e -> refreshRooms());
+
+        filterPanel.add(filterLabel);
+        filterPanel.add(filterBox);
+        topPanel.add(filterPanel, BorderLayout.SOUTH);
+
+        add(topPanel, BorderLayout.NORTH);
 
         // --- 2. ODA LİSTESİ (ORTA) ---
         roomPanel = new JPanel(new GridLayout(0, 3, 20, 20));
@@ -38,29 +67,46 @@ public class HotelGUI extends JFrame {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
         bottomPanel.setBackground(Color.LIGHT_GRAY);
 
-        JButton refreshButton = new JButton("Listeyi Yenile");
-        refreshButton.setFont(new Font("Arial", Font.BOLD, 14));
-        refreshButton.addActionListener(e -> refreshRooms());
-
         JButton manageButton = new JButton("Rezervasyon & Ödeme Yönetimi");
         manageButton.setFont(new Font("Arial", Font.BOLD, 14));
         manageButton.setBackground(new Color(40, 167, 69)); // Yeşilimsi buton
         manageButton.setForeground(Color.WHITE);
         manageButton.addActionListener(e -> openManageReservationsWindow());
 
-        bottomPanel.add(refreshButton);
         bottomPanel.add(manageButton);
         add(bottomPanel, BorderLayout.SOUTH);
 
+        // İlk açılışta odaları yükle
         refreshRooms();
     }
 
-    // --- ODA LİSTELEME ---
+    // --- ODA LİSTELEME (GÜNCELLENDİ: FİLTRE MANTIĞI) ---
     private void refreshRooms() {
         roomPanel.removeAll();
+
+        // Seçilen filtreyi al ("Tümü", "Standart Oda" vs.)
+        String selectedFilter = (String) filterBox.getSelectedItem();
+
         for (Room room : hotel.getRooms()) {
-            roomPanel.add(createRoomCard(room));
+            boolean match = false;
+
+            // Filtre Mantığı (Polimorfizm kontrolü - instanceof)
+            if (selectedFilter.equals("Tümü")) {
+                match = true;
+            } else if (selectedFilter.equals("Standart Oda") && room instanceof StandardRoom) {
+                match = true;
+            } else if (selectedFilter.equals("Deluxe Oda") && room instanceof DeluxeRoom) {
+                match = true;
+            } else if (selectedFilter.equals("Balayı Suiti") && room instanceof HoneymoonSuite) {
+                match = true;
+            }
+
+            // Eğer filtreye uyuyorsa ekrana ekle
+            if (match) {
+                roomPanel.add(createRoomCard(room));
+            }
         }
+
         roomPanel.revalidate();
         roomPanel.repaint();
     }
@@ -94,7 +140,7 @@ public class HotelGUI extends JFrame {
         return card;
     }
 
-    // --- YÖNETİM PENCERESİ (DÜZELTİLDİ: EKSTRA HARCAMA EKLENDİ) ---
+    // --- YÖNETİM PENCERESİ ---
     private void openManageReservationsWindow() {
         JDialog dialog = new JDialog(this, "Rezervasyon & Ödeme", true);
         dialog.setSize(750, 600);
@@ -115,13 +161,11 @@ public class HotelGUI extends JFrame {
                         BorderFactory.createEmptyBorder(5, 5, 5, 5),
                         BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1)
                 ));
-                resRow.setMaximumSize(new Dimension(700, 110)); // Yüksekliği biraz artırdık
+                resRow.setMaximumSize(new Dimension(700, 110));
                 resRow.setBackground(Color.WHITE);
 
-                // --- SOL: Bilgiler ---
                 String paymentStatus = res.isPaid() ? "<span style='color:green'>✔ ÖDENDİ</span>" : "<span style='color:red'>✖ ÖDENMEDİ</span>";
 
-                // BURASI EKLENDİ: Ekstra Harcama satırı geri geldi
                 String info = "<html><b>Rezervasyon #" + res.getId() + "</b> | Oda: " + res.getRoom().getRoomNumber() + "<br>" +
                         "Müşteri: " + res.getCustomer().getName() + "<br>" +
                         "Ekstra Harcama: <b style='color:blue'>" + res.getServiceCost() + " TL</b><br>" +
@@ -132,60 +176,49 @@ public class HotelGUI extends JFrame {
                 infoLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
                 resRow.add(infoLabel, BorderLayout.CENTER);
 
-                // --- SAĞ: Butonlar ---
                 JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
                 buttonsPanel.setBackground(Color.WHITE);
 
-                // 1. ODA SERVİSİ
                 JButton serviceBtn = new JButton("Servis Ekle");
-                serviceBtn.setBackground(new Color(255, 193, 7)); // Sarı
+                serviceBtn.setBackground(new Color(255, 193, 7));
                 serviceBtn.addActionListener(e -> {
                     String costStr = JOptionPane.showInputDialog(dialog, "Harcama tutarı (TL):");
                     if (costStr != null) {
                         try {
                             res.addServiceCost(Double.parseDouble(costStr));
-                            dialog.dispose(); openManageReservationsWindow(); // Yenile
+                            dialog.dispose(); openManageReservationsWindow();
                         } catch (Exception ex) { }
                     }
                 });
 
-                // 2. ÖDEME BUTONU
                 JButton payBtn = new JButton("ÖDEME AL");
-
-                // Eğer zaten ödenmişse veya iptal edilmişse butonu kapat
                 if (res.isPaid()) {
                     payBtn.setText("ÖDENDİ");
                     payBtn.setEnabled(false);
                     payBtn.setBackground(Color.GRAY);
                 } else {
-                    payBtn.setBackground(new Color(0, 123, 255)); // Mavi
+                    payBtn.setBackground(new Color(0, 123, 255));
                     payBtn.setForeground(Color.WHITE);
                     payBtn.addActionListener(e -> {
                         String[] options = {"Kredi Kartı", "Nakit"};
                         int choice = JOptionPane.showOptionDialog(dialog,
                                 "Toplam Tutar: " + res.getTotalPrice() + " TL\nÖdeme yöntemi seçiniz:",
-                                "Ödeme Ekranı (Check-out)",
+                                "Ödeme Ekranı",
                                 JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
                         if (choice != -1) {
                             String method = options[choice];
                             Payment payment = new Payment(new Random().nextInt(1000), res.getTotalPrice(), method);
                             boolean success = payment.processPayment();
-
                             if (success) {
-                                res.confirmPayment(); // Odayı boşa çıkarır ve COMPLETED yapar
-
+                                res.confirmPayment();
                                 JOptionPane.showMessageDialog(dialog, "Ödeme Başarılı!\nOda çıkışı yapıldı ve müsait duruma getirildi.");
-
-                                dialog.dispose(); // Pencereyi kapat
-                                openManageReservationsWindow(); // Listeyi yenilemek için tekrar aç
-                                refreshRooms(); // <--- ÖNEMLİ: Ana ekrandaki odaları YENİLE (Yeşile dönsün)
+                                dialog.dispose(); openManageReservationsWindow(); refreshRooms();
                             }
                         }
                     });
                 }
 
-                // 3. İPTAL BUTONU
                 JButton cancelBtn = new JButton("İPTAL");
                 cancelBtn.setBackground(Color.RED);
                 cancelBtn.setForeground(Color.WHITE);
