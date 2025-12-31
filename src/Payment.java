@@ -1,11 +1,11 @@
 /**
  * Payment.java
- * Ödeme işlemini temsil eden basit sınıf.
+ * Ödeme işlemlerini simüle eden sınıf.
  */
 public class Payment {
     private int paymentId;
-    private double amount;          // Ödenen miktar
-    private String paymentMethod;   // "Kredi Kartı", "Nakit" vb.
+    private double amount;
+    private String paymentMethod; // "Kredi Kartı", "Nakit"
 
     public Payment(int paymentId, double amount, String paymentMethod) {
         this.paymentId = paymentId;
@@ -13,13 +13,18 @@ public class Payment {
         this.paymentMethod = paymentMethod;
     }
 
-    // Ödeme işlemini gerçekleştiren (simüle eden) metod
-    public void processPayment() {
+    // Ödeme işlemini gerçekleştiren metod
+    public boolean processPayment() {
         System.out.println("----------------------------------------");
-        System.out.println("ÖDEME İŞLEMİ BAŞLATILIYOR...");
+        System.out.println("ÖDEME İŞLEMİ BAŞLATILIYOR (ID: " + paymentId + ")");
         System.out.println("Tutar: " + amount + " TL");
         System.out.println("Yöntem: " + paymentMethod);
-        System.out.println("Ödeme Başarıyla Alındı (ID: " + paymentId + ")");
+
+        // Simülasyon: Ödeme her zaman başarılı varsayalım
+        System.out.println("Banka ile iletişim kuruluyor...");
+        System.out.println("Ödeme Başarıyla Alındı ✔");
         System.out.println("----------------------------------------");
+
+        return true; // Başarılı döndür
     }
 }
