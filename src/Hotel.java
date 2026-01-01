@@ -24,7 +24,7 @@ public class Hotel {
         rooms.add(room);
     }
 
-    // --- 2. Boş Odaları Arama (Kart 14) ---
+    // --- 2. Boş Odaları Arama  ---
     public void listAvailableRooms() {
         System.out.println("--- " + name + " : MÜSAİT ODALAR ---");
         boolean found = false;
@@ -42,7 +42,7 @@ public class Hotel {
         }
     }
 
-    // --- 3. Rezervasyon Yapma (Kart 15) ---
+    // --- 3. Rezervasyon Yapma
     public void makeReservation(int roomNumber, Customer customer, int nightCount) {
         // Önce odayı bulalım
         Room selectedRoom = getRoom(roomNumber);
@@ -73,7 +73,7 @@ public class Hotel {
         System.out.println("---------------------------------------");
     }
 
-    // --- 4. Rezervasyon İptal Etme (Kart 16) ---
+    // --- 4. Rezervasyon İptal Etme  ---
     public void cancelReservation(int reservationId) {
         Reservation targetReservation = null;
 

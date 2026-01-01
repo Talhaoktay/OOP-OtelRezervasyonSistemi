@@ -11,9 +11,6 @@ public class Main {
         // 1. ADIM: Oteli Oluştur
         Hotel myHotel = new Hotel("Yıldız Teknik Palas");
 
-        // 2. ADIM: Odaları Ekle
-        // Not: Resim yolları (src/img/...) StandardRoom ve DeluxeRoom sınıflarının içinde
-        // otomatik ayarlandığı için burada sadece numara, kapasite ve fiyatları giriyoruz.
 
         // Standart Odalar
         myHotel.addRoom(new StandardRoom(101, 2, 500.0));
@@ -26,13 +23,13 @@ public class Main {
         myHotel.addRoom(new DeluxeRoom(202, 4, 1200.0)); // Aile odası
         myHotel.addRoom(new DeluxeRoom(301, 2, 1500.0)); // Kral Dairesi
 
-        // BALAYI SUİTLERİ (YENİ)
+        // BALAYI SUİTLERİ
         // Baz fiyat 1000 TL veriyoruz ama 3 katı olacağı için 3000 TL görünecek.
         myHotel.addRoom(new HoneymoonSuite(401, 1000.0));
         myHotel.addRoom(new HoneymoonSuite(402, 1000.0));
 
         // 3. ADIM: Arayüzü (Pencereyi) Başlat
-        // Swing uygulamalarının donmaması için 'invokeLater' kullanılır.
+        // Swing uygulamalarının donmaması için 'invokeLater' kullanıldı.
         SwingUtilities.invokeLater(() -> {
             // Arayüzü oluştur
             HotelGUI gui = new HotelGUI(myHotel);

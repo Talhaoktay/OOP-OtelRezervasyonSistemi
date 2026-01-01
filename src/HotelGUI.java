@@ -250,21 +250,52 @@ public class HotelGUI extends JFrame {
         dialog.setVisible(true);
     }
 
+    // --- REZERVASYON PENCERESİ (GÜNCELLENDİ: EMAİL EKLENDİ) ---
     private void showReservationPopup(Room room) {
-        String name = JOptionPane.showInputDialog(this, "Misafir Adı Soyadı:");
-        if (name == null || name.isEmpty()) return;
-        String phone = JOptionPane.showInputDialog(this, "Telefon:");
-        if (phone == null) return;
-        String days = JOptionPane.showInputDialog(this, "Kaç Gece?");
-        if (days == null) return;
+        // 1. Veri giriş kutucuklarını oluşturuyoruz
+        JTextField nameField = new JTextField();
+        JTextField phoneField = new JTextField();
+        JTextField emailField = new JTextField(); // Yeni eklenen Email alanı
+        JTextField daysField = new JTextField();
 
-        try {
-            int d = Integer.parseInt(days);
-            hotel.makeReservation(room.getRoomNumber(), new Customer(name, phone, ""), d);
-            JOptionPane.showMessageDialog(this, "Rezervasyon Başarılı!");
-            refreshRooms();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Hatalı Giriş!");
+        // 2. Bu kutucukları ekranda görünecek sıraya koyuyoruz
+        Object[] message = {
+                "Misafir Adı Soyadı:", nameField,
+                "Telefon Numarası:", phoneField,
+                "Email Adresi:", emailField,    // Ekranda görünecek kısım
+                "Kaç Gece Kalınacak:", daysField
+        };
+
+        // 3. Pencereyi açıyoruz
+        int option = JOptionPane.showConfirmDialog(this, message, "Rezervasyon Oluştur", JOptionPane.OK_CANCEL_OPTION);
+
+        // 4. Kullanıcı "OK" butonuna basarsa verileri alıyoruz
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String name = nameField.getText();
+                String phone = phoneField.getText();
+                String email = emailField.getText(); // Email bilgisini aldık
+                String daysStr = daysField.getText();
+
+                // Boş alan kontrolü (İsteğe bağlı)
+                if (name.isEmpty() || daysStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Lütfen gerekli alanları doldurunuz!");
+                    return;
+                }
+
+                int days = Integer.parseInt(daysStr);
+
+                // BURASI ÖNEMLİ: Customer oluştururken artık email'i de gönderiyoruz.
+                hotel.makeReservation(room.getRoomNumber(), new Customer(name, phone, email), days);
+
+                JOptionPane.showMessageDialog(this, "Rezervasyon Başarıyla Tamamlandı!");
+                refreshRooms(); // Ekranı yenile
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Lütfen gün sayısını sayı olarak giriniz!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Bir hata oluştu: " + ex.getMessage());
+            }
         }
     }
 }
