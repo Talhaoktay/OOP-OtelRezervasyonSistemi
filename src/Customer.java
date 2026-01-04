@@ -1,20 +1,20 @@
 /**
  * Customer.java
- * Otelde konaklayacak müşterinin temel bilgilerini tutar.
+ * Müşteri bilgilerini tutar: Ad, Telefon ve Email.
  */
 public class Customer {
     private String name;
     private String phone;
     private String email;
 
-    // Kurucu Metod (Constructor)
+    // Kurucu Metot
     public Customer(String name, String phone, String email) {
         this.name = name;
         this.phone = phone;
         this.email = email;
     }
 
-    // Getter metodları (Bilgilere erişmek için)
+    // Getter Metotları
     public String getName() {
         return name;
     }
@@ -29,6 +29,6 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Musteri: " + name + " (" + phone + ")";
+        return name + " (" + email + ")";
     }
 }

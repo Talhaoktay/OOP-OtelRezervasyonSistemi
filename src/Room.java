@@ -51,4 +51,5 @@ public abstract class Room implements Reservable {
     public String toString() {
         return "Oda No: " + roomNumber + " (" + capacity + " Kişilik)";
     }
+
 }

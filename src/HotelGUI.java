@@ -250,51 +250,76 @@ public class HotelGUI extends JFrame {
         dialog.setVisible(true);
     }
 
-    // --- REZERVASYON PENCERESİ (GÜNCELLENDİ: EMAİL EKLENDİ) ---
+    // --- GÜNCELLENDİ: VERİLER SİLİNMEZ & TOPLU HATA GÖSTERİR ---
     private void showReservationPopup(Room room) {
-        // 1. Veri giriş kutucuklarını oluşturuyoruz
+        // 1. Alanları döngünün dışında oluşturuyoruz (Veriler silinmesin diye)
         JTextField nameField = new JTextField();
         JTextField phoneField = new JTextField();
-        JTextField emailField = new JTextField(); // Yeni eklenen Email alanı
+        JTextField emailField = new JTextField();
         JTextField daysField = new JTextField();
 
-        // 2. Bu kutucukları ekranda görünecek sıraya koyuyoruz
         Object[] message = {
                 "Misafir Adı Soyadı:", nameField,
                 "Telefon Numarası:", phoneField,
-                "Email Adresi:", emailField,    // Ekranda görünecek kısım
+                "Email Adresi:", emailField,
                 "Kaç Gece Kalınacak:", daysField
         };
 
-        // 3. Pencereyi açıyoruz
-        int option = JOptionPane.showConfirmDialog(this, message, "Rezervasyon Oluştur", JOptionPane.OK_CANCEL_OPTION);
+        // 2. Sonsuz döngü başlatıyoruz (Doğru girene kadar dön)
+        while (true) {
+            int option = JOptionPane.showConfirmDialog(this, message, "Rezervasyon Oluştur", JOptionPane.OK_CANCEL_OPTION);
 
-        // 4. Kullanıcı "OK" butonuna basarsa verileri alıyoruz
-        if (option == JOptionPane.OK_OPTION) {
+            if (option != JOptionPane.OK_OPTION) {
+                return; // İptal'e veya Çarpı'ya basarsa işlemden çık
+            }
+
+            // Verileri al
+            String name = nameField.getText().trim();
+            String phone = phoneField.getText().trim();
+            String email = emailField.getText().trim();
+            String daysStr = daysField.getText().trim();
+
+            // Hata mesajlarını biriktir
+            StringBuilder errorMsg = new StringBuilder();
+
+            if (name.isEmpty()) errorMsg.append("- Misafir Adı Soyadı boş bırakılamaz.\n");
+            if (phone.isEmpty()) errorMsg.append("- Telefon Numarası boş bırakılamaz.\n");
+            if (email.isEmpty()) errorMsg.append("- Email Adresi boş bırakılamaz.\n");
+            if (daysStr.isEmpty()) errorMsg.append("- Kaç Gece Kalınacak boş bırakılamaz.\n");
+
+            // --- HATA VARSA GÖSTER VE DÖNGÜYE DEVAM ET ---
+            if (errorMsg.length() > 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Lütfen aşağıdaki alanları doldurunuz:\n\n" + errorMsg.toString(),
+                        "Eksik Bilgi",
+                        JOptionPane.WARNING_MESSAGE);
+
+                continue; // Döngünün başına dön (Pencere tekrar açılır, veriler durur)
+            }
+
+            // --- SAYI KONTROLÜ VE KAYIT ---
             try {
-                String name = nameField.getText();
-                String phone = phoneField.getText();
-                String email = emailField.getText(); // Email bilgisini aldık
-                String daysStr = daysField.getText();
-
-                // Boş alan kontrolü (İsteğe bağlı)
-                if (name.isEmpty() || daysStr.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Lütfen gerekli alanları doldurunuz!");
-                    return;
-                }
-
                 int days = Integer.parseInt(daysStr);
 
-                // BURASI ÖNEMLİ: Customer oluştururken artık email'i de gönderiyoruz.
+                if (days <= 0) {
+                    JOptionPane.showMessageDialog(this, "Gün sayısı 0'dan büyük olmalıdır!", "Hata", JOptionPane.WARNING_MESSAGE);
+                    continue; // Hatalıysa başa dön
+                }
+
+                // Hata yoksa kaydet ve döngüden çık (break)
                 hotel.makeReservation(room.getRoomNumber(), new Customer(name, phone, email), days);
 
-                JOptionPane.showMessageDialog(this, "Rezervasyon Başarıyla Tamamlandı!");
-                refreshRooms(); // Ekranı yenile
+                JOptionPane.showMessageDialog(this, "Rezervasyon Başarıyla Oluşturuldu!");
+                refreshRooms();
+                break; // İşlem başarılı, döngüyü bitir.
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Lütfen gün sayısını sayı olarak giriniz!");
+                JOptionPane.showMessageDialog(this, "Gün sayısı kısmına sadece rakam giriniz!", "Hatalı Giriş", JOptionPane.ERROR_MESSAGE);
+                // continue yazmasak da döngü başa döner ama mantığı anlaman için:
+                continue;
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Bir hata oluştu: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Hata: " + ex.getMessage());
+                break; // Beklenmedik hatada çık
             }
         }
     }
