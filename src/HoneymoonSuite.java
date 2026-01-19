@@ -1,23 +1,16 @@
-/**
- * HoneymoonSuite.java
- * Özel balayı çiftleri için tasarlanmış lüks oda.
- */
 public class HoneymoonSuite extends Room {
+    private double price;
 
-    public HoneymoonSuite(int roomNumber, double basePrice) {
-        // Balayı odaları genelde 2 kişiliktir.
-        // Resim yolu otomatik olarak 'honeymoon.jpg' seçilir.
-        super(roomNumber, 2, basePrice, "src/img/honeymoon.jpg");
+    public HoneymoonSuite(int roomNumber, double price) {
+        super(roomNumber, "img/honeymoon.jpg");
+        this.price = price;
     }
 
     @Override
-    public double calculatePrice() {
-        // Balayı suiti, baz fiyatın 3 katıdır (Özel hizmet, jakuzi vb.)
-        return getBasePrice() * 3.0;
-    }
-
-    @Override
-    public String toString() {
-        return "[BALAYI SUİTİ] " + super.toString() + " - Fiyat: " + calculatePrice() + " TL";
+    public double calculatePrice(Season season) {
+        // Balayı suiti normalde 3 katkı
+        // Yazın: Fiyat * 3 * 2 (Yaz zammı)
+        double multiplier = (season == Season.SUMMER) ? 2.0 : 1.0;
+        return price * 3.0 * multiplier;
     }
 }

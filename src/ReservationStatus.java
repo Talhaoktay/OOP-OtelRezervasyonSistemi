@@ -1,9 +1,8 @@
 /**
- * ReservationStatus.java
- * Rezervasyonun güncel durumunu belirtir.
+ * Rezervasyonların durumunu belirten Enum yapısı.
  */
 public enum ReservationStatus {
-    ACTIVE,     // // Aktif rezervasyon Rezervasyon geçerli
-    CANCELLED,  // Rezervasyon iptal edilmiş
-    COMPLETED   // Konaklama tamamlanmış
+    ACTIVE,      // Rezervasyon şu an aktif (Müşteri kalıyor veya kalacak)
+    CANCELLED,   // Rezervasyon iptal edildi
+    CHECKED_OUT  // Müşteri ödemeyi yaptı ve otelden ayrıldı
 }

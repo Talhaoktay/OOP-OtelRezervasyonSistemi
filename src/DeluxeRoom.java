@@ -1,17 +1,18 @@
 public class DeluxeRoom extends Room {
+    private int bedCount;
+    private double price;
 
-    public DeluxeRoom(int roomNumber, int capacity, double basePrice) {
-        // "src/img/deluxe.jpg" yolunu buraya elle veriyoruz
-        super(roomNumber, capacity, basePrice, "src/img/deluxe.jpg");
+    public DeluxeRoom(int roomNumber, int bedCount, double price) {
+        super(roomNumber, "img/deluxe.jpg");
+        this.bedCount = bedCount;
+        this.price = price;
     }
 
     @Override
-    public double calculatePrice() {
-        return getBasePrice() * 1.5; // %50 daha pahalı
-    }
-
-    @Override
-    public String toString() {
-        return "[Deluxe]   " + super.toString() + " - Fiyat: " + calculatePrice() + " TL";
+    public double calculatePrice(Season season) {
+        // Normalde Deluxe %20 pahalı.
+        // Yazın 2 katına çıkınca yine %20 ekstra korunuyor.
+        double baseRate = (season == Season.SUMMER) ? price * 2.0 : price;
+        return baseRate * 1.20;
     }
 }

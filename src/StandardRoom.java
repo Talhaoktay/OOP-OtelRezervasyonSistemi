@@ -1,17 +1,30 @@
 public class StandardRoom extends Room {
+    private int bedCount;
+    private double price;
 
-    public StandardRoom(int roomNumber, int capacity, double basePrice) {
-        // "src/img/standard.jpg" yolunu buraya elle veriyoruz
-        super(roomNumber, capacity, basePrice, "src/img/standard.jpg");
+    // Hotel.java içinde new StandardRoom(101, 2, 500.0) dediğimiz yer burayı çalıştırır.
+    public StandardRoom(int roomNumber, int bedCount, double price) {
+        // Üst sınıfa (Room) sadece onun istediği bilgileri veriyoruz:
+        // Standart odalar için varsayılan bir resim yolu atadık.
+        super(roomNumber, "img/standard.jpg");
+
+        // Diğer bilgiler bu sınıfa özel olduğu için kendimiz tutuyoruz
+        this.bedCount = bedCount;
+        this.price = price;
+    }
+
+    // Eğer özel resim yolu vermek istersen diye bu versiyonu da ekleyebiliriz
+    public StandardRoom(int roomNumber, int bedCount, double price, String imagePath) {
+        super(roomNumber, imagePath);
+        this.bedCount = bedCount;
+        this.price = price;
     }
 
     @Override
-    public double calculatePrice() {
-        return getBasePrice();
-    }
-
-    @Override
-    public String toString() {
-        return "[Standart] " + super.toString() + " - Fiyat: " + calculatePrice() + " TL";
+    public double calculatePrice(Season season) {
+        if (season == Season.SUMMER) {
+            return price * 2.0; // Yazın fiyat 2 katı
+        }
+        return price;
     }
 }

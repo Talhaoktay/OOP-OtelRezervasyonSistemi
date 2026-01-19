@@ -1,55 +1,59 @@
 /**
  * Room.java
- * Tüm oda tiplerinin atası olan soyut sınıf.
- * Resim yolu (imagePath) özelliği eklendi.
+ * Güncellendi: Artık Reservable arayüzünü (Interface) uyguluyor.
  */
+// 1. "implements Reservable" ekliyoruz
 public abstract class Room implements Reservable {
     private int roomNumber;
-    private int capacity;
-    private double basePrice;
-    private boolean isBooked;
-    private String imagePath; // <--- YENİ: Resim dosyasının yolu
+    private boolean isAvailable;
+    private String imagePath;
 
-    // Constructor (Kurucu Metod) güncellendi
-    public Room(int roomNumber, int capacity, double basePrice, String imagePath) {
+    public Room(int roomNumber, String imagePath) {
         this.roomNumber = roomNumber;
-        this.capacity = capacity;
-        this.basePrice = basePrice;
         this.imagePath = imagePath;
-        this.isBooked = false;
+        this.isAvailable = true;
     }
 
-    // Her oda tipi fiyatı kendi hesaplar
-    public abstract double calculatePrice();
+    // --- Reservable Interface Metotları ---
 
-    // --- Reservable Interface Metodları ---
+    // 2. isAvailable() zaten vardı, Interface ile uyumlu.
     @Override
     public boolean isAvailable() {
-        return !isBooked;
+        return isAvailable;
     }
 
+    // 3. reserve() metodunu daha önce eklemiştik, bu da uyumlu.
     @Override
     public void reserve() {
-        this.isBooked = true;
-        System.out.println("Oda " + roomNumber + " rezerve edildi.");
+        this.isAvailable = false;
     }
 
+    // 4. cancelReservation() metodunu senin Interface'ine göre ekliyoruz.
     @Override
     public void cancelReservation() {
-        this.isBooked = false;
-        System.out.println("Oda " + roomNumber + " iptal edildi.");
+        this.isAvailable = true; // Odayı tekrar boş yap
+    }
+    // --------------------------------------
+
+    public int getRoomNumber() {
+        return roomNumber;
     }
 
-    // --- Getter Metodları ---
-    public int getRoomNumber() { return roomNumber; }
-    public int getCapacity() { return capacity; }
-    public double getBasePrice() { return basePrice; }
-    public String getImagePath() { return imagePath; } // <--- GUI için gerekli
-    public boolean isBooked() { return isBooked; }
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    // Bu metodu silmeyelim, Hotel sınıfı kullanabiliyor ama
+    // doğrusu üstteki cancelReservation'ı kullanmaktır.
+    public void setAvailable(boolean available) {
+        this.isAvailable = available;
+    }
+
+    // Fiyat hesaplama artık sezona göre değişiyor
+    public abstract double calculatePrice(Season season);
 
     @Override
     public String toString() {
-        return "Oda No: " + roomNumber + " (" + capacity + " Kişilik)";
+        return "Oda No: " + roomNumber;
     }
-
 }
